@@ -6,13 +6,13 @@
 * run _**idea .**_
 
 ```
-mkdir alternative-tic-tac-toe-online
-cd alternative-tic-tac-toe-online
+mkdir tic-tac-toe-online-ktor-168
+cd tic-tac-toe-online-ktor-168
 gradle init
 # accept defaults, except use the Groovy version of the DSL
 
 
-        C:\Users\myuser\alternative-tic-tac-toe-online>gradle init
+        C:\Users\myuser\tic-tac-toe-online-ktor-168>gradle init
 
         Select type of build to generate:
 1: Application
@@ -32,7 +32,7 @@ Enter selection (default: Java) [1..6] 2
 
 Enter target Java version (min: 7, default: 21):
 
-Project name (default: alternative-tic-tac-toe-online):
+Project name (default: tic-tac-toe-online-ktor-168):
 
 Select application structure:
 1: Single application project
@@ -59,6 +59,6 @@ To learn more about Gradle by exploring our Samples at https://docs.gradle.org/8
 BUILD SUCCESSFUL in 25s
         1 actionable task: 1 executed
 
-        C:\Users\myuser\alternative-tic-tac-toe-online>idea .
+        C:\Users\myuser\tic-tac-toe-online-ktor-168>idea .
 
 ```
