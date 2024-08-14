@@ -171,9 +171,21 @@ fun clearAll() {
 
 
 fun Application.configureRouting() {
-
+    if (false) {
+        val port = environment.config.propertyOrNull("ktor.deployment.port")?.getString() ?: 8383
+        val verbose = (environment.config.propertyOrNull("ktor.mycustom.verbose")?.getString() ?: "false").toBoolean()
+        println(
+            """
+        ${"$-".repeat(20)}
+        configureRouting
+        port: $port
+        verbose: $verbose
+        ${"$-".repeat(20)}
+    """.trimIndent()
+        )
+    }
     routing {
-        get("/") {
+        get("/helloWorld") {
             call.respondText("Hello, World!")
         }
 

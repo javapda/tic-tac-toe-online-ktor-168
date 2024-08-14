@@ -3,6 +3,7 @@ package tictactoeonline
 import com.auth0.jwt.JWT
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -25,10 +26,16 @@ class ApplicationTest {
         withTestApplication(Application::module) {
             val game_id = 1
             handleRequest(HttpMethod.Get, "/game/$game_id/status") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 addHeader("Monkey", "Gorilla")
             }.apply {
-                println(response.status())
-                println(response.content)
+                println(
+                    """
+                    game status failed authorization
+                    response.status():   ${response.status()}
+                    response.content:    ${response.content}
+                """.trimIndent()
+                )
             }
         }
     }
@@ -67,7 +74,39 @@ class ApplicationTest {
     }
 
     @Test
-    fun `exercise help`() {
+    fun `no authentication GET helloWorld`() {
+        withTestApplication(Application::module) {
+            handleRequest(HttpMethod.Get, "/helloWorld"){
+                addHeader("Monkey", "from the jungle")
+                addHeader("Pig", "from the farm")
+            }.apply {
+                assertEquals(HttpStatusCode.OK, response.status())
+                assertEquals("Hello, World!", response.content)
+                println("Headers : ${request.headers.entries().size}")
+                request.headers.forEach{ s, slist ->
+                    println("$s:  $slist")
+                }
+                println("""
+                    request.acceptEncoding():  ${request.acceptEncoding()}    
+                    request.contentType():     ${request.contentType()}    
+                    request.cacheControl():    ${request.cacheControl()}    
+                    request.acceptEncoding():  ${request.acceptEncoding()}    
+                """.trimIndent())
+
+            }
+        }
+//        client.get("/helloWorld").apply {
+//            assertEquals(HttpStatusCode.OK, status)
+//            assertEquals("Hello World!", bodyAsText())
+//            assertEquals(HttpProtocolVersion.HTTP_1_1, version)
+//            // println("requestTime: $requestTime")
+//            // println("responseTime: $responseTime")
+
+    }
+
+
+    @Test
+    fun `get help`() {
         withTestApplication(Application::module) {
             handleRequest(HttpMethod.Get, "/help").apply {
 //                assertEquals(HttpStatusCode.OK, response.status())
@@ -81,10 +120,21 @@ class ApplicationTest {
     }
 
     @Test
+    fun `test with test application configuration`() = withTestApplication() {
+
+        println("""
+            environment.application.developmentMode:  ${environment.application.developmentMode}
+            environment == environment.application.environment: ${environment == environment.application.environment}
+            environment.config:  ${environment.config}
+            """.trimIndent())
+    }
+
+    @Test
     fun testjwt() {
         assertEquals(emailCarl, emailFromJwt(jwtCarl))
         assertEquals(emailMike, emailFromJwt(jwtMike))
         assertEquals(emailArtem, emailFromJwt(jwtArtem))
     }
+
 
 }
