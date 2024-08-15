@@ -89,6 +89,25 @@ class HyperskillStage3Example2Test {
                 assertEquals(1, info().num_users_signin)
             }
 
+            // 5. Request: POST /game
+            // auth Artem start a game as Player2
+            handleRequest(HttpMethod.Post, "/game") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user1.jwt}")
+
+                val email = emailFromJwt(user1.jwt!!)
+                val ngr: NewGameRequestPayload =
+                    NewGameRequestPayload(player1 = "", player2 = user1.email, size = example2Size)
+                val json = Json.encodeToString(ngr)
+                setBody(json)
+            }.apply {
+                val ngr: NewGameResponsePayload =
+                    Json.decodeFromString<NewGameResponsePayload>(response.content.toString())
+                assertEquals(Status.NEW_GAME_STARTED.statusCode, response.status())
+                assertEquals(Status.NEW_GAME_STARTED.message, ngr.status)
+                assertEquals(1, ngr.gameId)
+                assertEquals(example2Size, ngr.size)
+            }
 
         }
     }
