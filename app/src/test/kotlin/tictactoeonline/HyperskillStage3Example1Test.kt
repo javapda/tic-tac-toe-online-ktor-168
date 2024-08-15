@@ -185,6 +185,22 @@ class HyperskillStage3Example1Test {
                 assertEquals(Status.MOVE_REQUEST_WITHOUT_AUTHORIZATION.message, moveResponseWithoutAuth.status)
             }
 
+            // 11. Request: POST /game/1/move
+            // at this point a move to (1,1) has already been done
+            // here, we send the JWT for user : carl@example.com, but it is the same move and space already taken
+            // or maybe, it is not Carl's turn (he did the last move) - it should be Mike's (Player2's) turn
+            handleRequest(HttpMethod.Post, "/game/1/move") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user1.jwt}")
+                val json = Json.encodeToString(PlayerMoveRequestPayload("(1,1)"))
+                setBody(json)
+            }.apply {
+                assertEquals(Status.NO_RIGHTS_TO_MOVE.statusCode, response.status())
+                val moveResponseWithoutAuthAgain =
+                    Json.decodeFromString<PlayerMoveResponsePayload>(response.content.toString())
+                assertEquals(Status.NO_RIGHTS_TO_MOVE.message, moveResponseWithoutAuthAgain.status)
+            }
+
 
         }
 
