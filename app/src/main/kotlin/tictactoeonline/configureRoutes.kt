@@ -246,7 +246,7 @@ fun Application.configureRouting() {
         }
 
         get("/help") {
-            call.respond(help())
+            call.respond(Json.encodeToString(help()))
         }
 
         get("/info") {
