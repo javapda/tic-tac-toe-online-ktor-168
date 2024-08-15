@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class HyperskillStage3Example2Test {
     fun emailFromJwt(jwt: String) =
@@ -108,6 +109,19 @@ class HyperskillStage3Example2Test {
                 assertEquals(1, ngr.gameId)
                 assertEquals(example2Size, ngr.size)
             }
+
+            // 6. Request: POST /game/1/join
+            // auth join by Artem - Success
+            handleRequest(HttpMethod.Post, "/game/1/join") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user1.jwt}")
+            }.apply {
+                val bodyDataMap = Json.decodeFromString<Map<String, String>>(response.content.toString())
+                assertEquals(Status.JOINING_GAME_SUCCEEDED.statusCode, response.status())
+                assertTrue(bodyDataMap.containsKey("status"))
+                assertEquals(Status.JOINING_GAME_SUCCEEDED.message, bodyDataMap["status"])
+            }
+
 
         }
     }
