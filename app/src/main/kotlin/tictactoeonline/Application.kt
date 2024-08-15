@@ -20,6 +20,7 @@ fun Application.module(testing: Boolean = false) {
             call.application.environment.log.info("$key : $value")
         }
     }
+
     configureContentNegotiationForJsonSerializationAndDeserialization()
     configureAuthenticationAndAuthorization()
     configureRouting()

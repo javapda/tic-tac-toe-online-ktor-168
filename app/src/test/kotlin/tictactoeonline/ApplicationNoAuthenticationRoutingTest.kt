@@ -1,6 +1,7 @@
 package tictactoeonline
 
 import io.ktor.application.*
+import io.ktor.config.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.server.testing.*
@@ -14,7 +15,11 @@ class ApplicationNoAuthenticationRoutingTest {
     @Test
     fun `test root path`() {
         withTestApplication(Application::module) {
-            handleRequest(HttpMethod.Get, "/").apply {
+            handleRequest(HttpMethod.Get, "/"){
+                (environment.config as MapApplicationConfig).apply {
+                    put("jwt.secret", secretForJwt)
+                }
+            }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("Welcome to Tic-Tac-Toe Online", response.content)
             }

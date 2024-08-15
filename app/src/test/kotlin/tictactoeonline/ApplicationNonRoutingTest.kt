@@ -1,12 +1,15 @@
 package tictactoeonline
 
+import com.typesafe.config.ConfigFactory
+import io.ktor.application.*
+import io.ktor.config.*
 import io.ktor.server.testing.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ApplicationNonRoutingTest {
     @Test
-    fun `test with test application configuration`() = withTestApplication() {
+    fun `test with test application configuration`() = withTestApplication(Application::module) {
 
         println(
             """
