@@ -75,6 +75,20 @@ class HyperskillStage3Example2Test {
 
             }
 
+            // 4. Request: POST /signin
+            // signing Artem (Player1)
+            handleRequest(HttpMethod.Post, "/signin") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                val json = Json.encodeToString(user1)
+                setBody(json)
+            }.apply {
+                val playerSigninResponsePayload =
+                    Json.decodeFromString<PlayerSigninResponsePayload>(response.content.toString())
+                assertEquals(Status.SIGNED_IN.message, playerSigninResponsePayload.status)
+                assertEquals(1, UserSignedInStore.size)
+                assertEquals(1, info().num_users_signin)
+            }
+
 
         }
     }
