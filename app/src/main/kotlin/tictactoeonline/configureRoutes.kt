@@ -1,7 +1,9 @@
 package tictactoeonline
 
 import io.ktor.application.*
+import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -9,6 +11,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 
 enum class Status(val message: String, val statusCode: HttpStatusCode) {
     SIGNED_IN("Signed In", HttpStatusCode.OK), // with JWT
@@ -184,9 +187,62 @@ fun Application.configureRouting() {
     """.trimIndent()
         )
     }
+
     routing {
+
+        get("/") {
+            call.respondText("Welcome to Tic-Tac-Toe Online")
+        }
+
+        // no auth required
+        post("/upload") {
+            var fileDescription: String
+            var fileName: String
+            var fileUploadDestination: File = File(".")
+            // https://ktor.io/docs/old/requests.html#form_data
+            val multipartData = call.receiveMultipart()
+            multipartData.forEachPart { part ->
+                when (part) {
+                    is PartData.FormItem -> {
+                        fileDescription = part.value
+                    }
+
+                    is PartData.FileItem -> {
+                        fileName = part.originalFileName as String
+                        var fileBytes = part.streamProvider().readBytes()
+                        val destinationDirectory = File("build/uploads")
+                        if (!destinationDirectory.exists()) {
+                            destinationDirectory.mkdirs()
+                        }
+                        fileUploadDestination = File(destinationDirectory, fileName)
+                        fileUploadDestination.writeBytes(fileBytes)
+                    }
+
+                    is PartData.BinaryItem -> {
+                        println("Not doing anything with Binary Item")
+                        println("Binary Item name: ${part.name}")
+                    }
+
+                    else -> {
+                        throw Exception("DONT KNOW WHAT TYPE OF PART IT IS? part=${part}")
+                    }
+                }
+            }
+            println(
+                """
+                ${"=-".repeat(50)}
+                ${call.request.uri}
+                multipartData: $multipartData
+                ${"=-".repeat(50)}
+            """.trimIndent()
+            )
+            call.respondText("POST: upload, ${call.request.uri}, uploaded to ${fileUploadDestination.absoluteFile}")
+        }
         get("/helloWorld") {
             call.respondText("Hello, World!")
+        }
+        post("/helloWorld") {
+            call.respondText("POST: Hello, World!")
         }
 
         get("/help") {

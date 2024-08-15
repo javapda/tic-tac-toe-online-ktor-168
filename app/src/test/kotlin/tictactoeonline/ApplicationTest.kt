@@ -68,7 +68,7 @@ class ApplicationTest {
         withTestApplication(Application::module) {
             handleRequest(HttpMethod.Get, "/").apply {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals("Hello, World!", response.content)
+                assertEquals("Welcome to Tic-Tac-Toe Online", response.content)
             }
         }
     }
@@ -76,34 +76,56 @@ class ApplicationTest {
     @Test
     fun `no authentication GET helloWorld`() {
         withTestApplication(Application::module) {
-            handleRequest(HttpMethod.Get, "/helloWorld"){
+            handleRequest(HttpMethod.Get, "/helloWorld") {
                 addHeader("Monkey", "from the jungle")
                 addHeader("Pig", "from the farm")
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("Hello, World!", response.content)
                 println("Headers : ${request.headers.entries().size}")
-                request.headers.forEach{ s, slist ->
+                request.headers.forEach { s, slist ->
                     println("$s:  $slist")
                 }
-                println("""
+                println(
+                    """
                     request.acceptEncoding():  ${request.acceptEncoding()}    
                     request.contentType():     ${request.contentType()}    
                     request.cacheControl():    ${request.cacheControl()}    
                     request.acceptEncoding():  ${request.acceptEncoding()}    
-                """.trimIndent())
+                """.trimIndent()
+                )
 
             }
         }
-//        client.get("/helloWorld").apply {
-//            assertEquals(HttpStatusCode.OK, status)
-//            assertEquals("Hello World!", bodyAsText())
-//            assertEquals(HttpProtocolVersion.HTTP_1_1, version)
-//            // println("requestTime: $requestTime")
-//            // println("responseTime: $responseTime")
 
     }
 
+    @Test
+    fun `no authentication POST helloWorld`() {
+        withTestApplication(Application::module) {
+            handleRequest(HttpMethod.Post, "/helloWorld") {
+                addHeader("Monkey", "from the jungle")
+                addHeader("Pig", "from the farm")
+            }.apply {
+                assertEquals(HttpStatusCode.OK, response.status())
+                assertEquals("POST: Hello, World!", response.content)
+                println("Headers : ${request.headers.entries().size}")
+                request.headers.forEach { s, slist ->
+                    println("$s:  $slist")
+                }
+                println(
+                    """
+                    request.acceptEncoding():  ${request.acceptEncoding()}    
+                    request.contentType():     ${request.contentType()}    
+                    request.cacheControl():    ${request.cacheControl()}    
+                    request.acceptEncoding():  ${request.acceptEncoding()}    
+                """.trimIndent()
+                )
+
+            }
+        }
+
+    }
 
     @Test
     fun `get help`() {
@@ -122,19 +144,20 @@ class ApplicationTest {
     @Test
     fun `test with test application configuration`() = withTestApplication() {
 
-        println("""
+        println(
+            """
             environment.application.developmentMode:  ${environment.application.developmentMode}
             environment == environment.application.environment: ${environment == environment.application.environment}
             environment.config:  ${environment.config}
-            """.trimIndent())
+            """.trimIndent()
+        )
     }
 
     @Test
-    fun testjwt() {
+    fun `test jwt`() {
         assertEquals(emailCarl, emailFromJwt(jwtCarl))
         assertEquals(emailMike, emailFromJwt(jwtMike))
         assertEquals(emailArtem, emailFromJwt(jwtArtem))
     }
-
 
 }
