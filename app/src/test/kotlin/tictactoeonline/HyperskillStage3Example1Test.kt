@@ -148,6 +148,18 @@ class HyperskillStage3Example1Test {
                 assertEquals(Status.JOINING_GAME_SUCCEEDED.message, bodyDataMap["status"])
             }
 
+            // 8. Request: GET /game/1/status
+            handleRequest(HttpMethod.Get, "/game/1/status") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user1.jwt}")
+            }.apply {
+                assertEquals(Status.GET_STATUS_SUCCEEDED.statusCode, response.status())
+                val gameStatusResponsePayload =
+                    Json.decodeFromString<GameStatusResponsePayload>(response.content.toString())
+                assertEquals("1st player's move", gameStatusResponsePayload.status)
+            }
+
+
         }
 
 
