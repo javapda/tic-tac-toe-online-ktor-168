@@ -201,6 +201,21 @@ class HyperskillStage3Example1Test {
                 assertEquals(Status.NO_RIGHTS_TO_MOVE.message, moveResponseWithoutAuthAgain.status)
             }
 
+            // 12. Request: POST /game/1/move
+            // authorized request move by mike (Player2) to an occupied place (1,1)
+            // result will be a failure, 400 Bad Request,  "status": "Incorrect or impossible move"
+            handleRequest(HttpMethod.Post, "/game/1/move") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user2.jwt}")
+                val json = Json.encodeToString(PlayerMoveRequestPayload("(1,1)"))
+                setBody(json)
+            }.apply {
+                assertEquals(Status.INCORRECT_OR_IMPOSSIBLE_MOVE.statusCode, response.status())
+                assertEquals(
+                    Status.INCORRECT_OR_IMPOSSIBLE_MOVE.message,
+                    Json.decodeFromString<PlayerMoveResponsePayload>(response.content.toString()).status
+                )
+            }
 
         }
 
