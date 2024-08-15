@@ -159,6 +159,18 @@ class HyperskillStage3Example1Test {
                 assertEquals("1st player's move", gameStatusResponsePayload.status)
             }
 
+            // 9. Request: POST /game/1/move
+            // 1st move by Carl Player1 - successful move to (1,1)
+            handleRequest(HttpMethod.Post, "/game/1/move") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user1.jwt}")
+                setBody(Json.encodeToString(PlayerMoveRequestPayload("(1,1)")))
+
+            }.apply {
+                assertEquals(Status.MOVE_DONE.statusCode, response.status())
+                val moveResponse = Json.decodeFromString<PlayerMoveResponsePayload>(response.content.toString())
+                assertEquals(Status.MOVE_DONE.message, moveResponse.status)
+            }
 
         }
 

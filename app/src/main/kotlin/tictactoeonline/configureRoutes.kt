@@ -309,6 +309,46 @@ fun Application.configureRouting() {
                 }
             }
 
+            /**
+             * make a move
+             */
+            post("/game/{game_id}/move") {
+                call.parameters["game_id"]?.let { stringId ->
+                    stringId.toIntOrNull()?.let { game_id ->
+                        val playerEmail = call.playerEmail()
+                        val game = GameStore[game_id - 1]
+                        val ttt = game as TicTacToeOnline
+                        val playerMoveRequestPayload = call.receive<PlayerMoveRequestPayload>()
+                        val move = playerMoveRequestPayload.move
+
+                        if (ttt.currentPlayer.name != playerEmail) {
+                            // if it's not your turn, then you have no right
+                            call.respond(
+                                Status.NO_RIGHTS_TO_MOVE.statusCode,
+                                PlayerMoveResponsePayload(Status.NO_RIGHTS_TO_MOVE.message)
+                            )
+                        } else if (ttt.isValidMove(move) && ttt.isOccupied(move)) {
+                            // fail, move
+                            call.respond(
+                                Status.INCORRECT_OR_IMPOSSIBLE_MOVE.statusCode,
+                                PlayerMoveResponsePayload(Status.INCORRECT_OR_IMPOSSIBLE_MOVE.message)
+                            )
+                        } else if (ttt.isValidMove(move) && ttt.move(move)) {
+                            // success
+                            call.respond(
+                                Status.MOVE_DONE.statusCode,
+                                PlayerMoveResponsePayload(Status.MOVE_DONE.message)
+                            )
+                        } else {
+                            call.respond(
+                                Status.NO_RIGHTS_TO_MOVE.statusCode,
+                                PlayerMoveResponsePayload(Status.NO_RIGHTS_TO_MOVE.message)
+                            )
+                        }
+                    }
+                }
+            }
+
             get("/game/{game_id}/status") {
                 call.parameters["game_id"]?.let { stringId ->
                     stringId.toIntOrNull()?.let { game_id ->
