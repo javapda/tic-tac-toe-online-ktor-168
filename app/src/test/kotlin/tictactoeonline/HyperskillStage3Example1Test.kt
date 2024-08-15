@@ -172,6 +172,20 @@ class HyperskillStage3Example1Test {
                 assertEquals(Status.MOVE_DONE.message, moveResponse.status)
             }
 
+            // 10. Request: POST /game/1/move
+            // move request without authorization header, failure, 401 Unauthorized
+            handleRequest(HttpMethod.Post, "/game/1/move") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                val json = Json.encodeToString(PlayerMoveRequestPayload("(1,1)"))
+                setBody(json)
+            }.apply {
+                assertEquals(Status.MOVE_REQUEST_WITHOUT_AUTHORIZATION.statusCode, response.status())
+                val moveResponseWithoutAuth =
+                    Json.decodeFromString<PlayerMoveResponsePayload>(response.content.toString())
+                assertEquals(Status.MOVE_REQUEST_WITHOUT_AUTHORIZATION.message, moveResponseWithoutAuth.status)
+            }
+
+
         }
 
 
