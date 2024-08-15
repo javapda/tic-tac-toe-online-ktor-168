@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
@@ -40,6 +41,23 @@ class HyperskillStage3Example2Test {
                 assertEquals(0, info().num_users)
 
             }
+
+            // 2. Request: POST /signup
+            // signup Artem with email + password - Success
+            handleRequest(HttpMethod.Post, "/signup") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                user1 = User(email = emailArtem, password = "1234")
+                val json = Json.encodeToString(user1)
+                setBody(json)
+            }.apply {
+                assertEquals(Status.SIGNED_UP.statusCode, response.status())
+                assertEquals(
+                    Status.SIGNED_UP.message,
+                    Json.decodeFromString<Map<String, String>>(response.content.toString())["status"]
+                )
+                assertEquals(1, info().num_users)
+            }
+
 
         }
     }
