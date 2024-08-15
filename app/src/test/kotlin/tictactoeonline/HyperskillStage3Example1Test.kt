@@ -281,6 +281,17 @@ class HyperskillStage3Example1Test {
                 )
             }
 
+            // 17. Request: GET /game/1/status
+            // auth request by Carl (Player1) for status - Success
+            handleRequest(HttpMethod.Get, "/game/1/status") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user1.jwt}")
+            }.apply {
+                assertEquals(Status.GET_STATUS_SUCCEEDED.statusCode, response.status())
+                val gameStatusResponsePayloadAfterStep16 =
+                    Json.decodeFromString<GameStatusResponsePayload>(response.content.toString())
+                assertEquals("1st player won", gameStatusResponsePayloadAfterStep16.status)
+            }
 
         }
 
