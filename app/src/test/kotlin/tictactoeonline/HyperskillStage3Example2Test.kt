@@ -58,6 +58,23 @@ class HyperskillStage3Example2Test {
                 assertEquals(1, info().num_users)
             }
 
+            // 3. Request: POST /signin
+            // signin Artem with incorrect password
+            handleRequest(HttpMethod.Post, "/signin") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                val json = Json.encodeToString(user1)
+                setBody(json)
+            }.apply {
+                val playerSigninResponsePayload =
+                    Json.decodeFromString<PlayerSigninResponsePayload>(response.content.toString())
+                user1.jwt = playerSigninResponsePayload.token
+                assertEquals(Status.SIGNED_IN.statusCode, response.status())
+                assertEquals(Status.SIGNED_IN.message, playerSigninResponsePayload.status)
+                assertEquals(1, UserSignedInStore.size)
+                assertEquals(1, info().num_users_signin)
+
+            }
+
 
         }
     }
