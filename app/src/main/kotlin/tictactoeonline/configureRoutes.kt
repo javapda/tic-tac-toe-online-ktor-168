@@ -281,6 +281,34 @@ fun Application.configureRouting() {
                 call.respond(respPayload)
             }
 
+            /**
+             * Join a game
+             */
+            post("/game/{game_id}/join") {
+                call.parameters["game_id"]?.let { stringId ->
+                    val playerEmail = call.playerEmail()
+                    stringId.toIntOrNull()?.let { game_id ->
+                        if (game_id in 0 until GameStore.lastIndex) {
+                            call.respond(
+                                Status.JOINING_GAME_FAILED.statusCode,
+                                mapOf("status" to Status.JOINING_GAME_FAILED.message)
+                            )
+                        } else {
+                            val game = GameStore[game_id - 1]
+                            val ttt = game as TicTacToeOnline
+                            // need utility to get player from JWT
+                            val user = UserStore.find { user -> user.email == playerEmail }
+
+                            ttt.addPlayer(Player(name = user?.email ?: "BOGUS-EMAIL", marker = 'X'))
+
+                            @Serializable
+                            data class StatusPayload(val status: String = Status.JOINING_GAME_SUCCEEDED.message)
+                            call.respond(Status.JOINING_GAME_SUCCEEDED.statusCode, StatusPayload())
+                        }
+                    }
+                }
+            }
+
             get("/game/{game_id}/status") {
                 call.parameters["game_id"]?.let { stringId ->
                     stringId.toIntOrNull()?.let { game_id ->
