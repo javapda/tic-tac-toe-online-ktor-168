@@ -251,6 +251,21 @@ class HyperskillStage3Example1Test {
 
             }
 
+            // 15. Request: POST /game/1/move
+            // auth move by Mike (Player2) to (2,2)
+            handleRequest(HttpMethod.Post, "/game/1/move") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, "Bearer ${user2.jwt}")
+                val json = Json.encodeToString(PlayerMoveRequestPayload("(2,2)"))
+                setBody(json)
+            }.apply {
+                assertEquals(Status.MOVE_DONE.statusCode, response.status())
+                assertEquals(
+                    Status.MOVE_DONE.message,
+                    Json.decodeFromString<PlayerMoveResponsePayload>(response.content.toString()).status
+                )
+            }
+
 
         }
 
