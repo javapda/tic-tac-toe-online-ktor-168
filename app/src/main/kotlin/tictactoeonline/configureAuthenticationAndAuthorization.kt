@@ -49,9 +49,9 @@ fun Application.configureAuthenticationAndAuthorization() {
                 }
             }
             challenge { defaultScheme, realm ->
-                val status: Status =
-                    if (call.request.uri.lowercase().contains("move")) Status.MOVE_REQUEST_WITHOUT_AUTHORIZATION
-                    else Status.AUTHORIZATION_FAILED
+                val status: Status = Status.AUTHORIZATION_FAILED
+//                    if (call.request.uri.lowercase().contains("move")) Status.MOVE_REQUEST_WITHOUT_AUTHORIZATION
+//                    else Status.AUTHORIZATION_FAILED
                 call.respond(status.statusCode, mapOf("status" to status.message))
             }
         }

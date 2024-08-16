@@ -19,6 +19,7 @@ import java.io.File
 
 enum class Status(val message: String, val statusCode: HttpStatusCode) {
     SIGNED_IN("Signed In", HttpStatusCode.OK), // with JWT
+    SIGNED_IN_FAILED("Authorization failed", HttpStatusCode.Forbidden), // with JWT
     SIGNED_UP("Signed Up", HttpStatusCode.OK),
     AUTHORIZATION_FAILED("Authorization failed", HttpStatusCode.Unauthorized),
     INCORRECT_OR_IMPOSSIBLE_MOVE("Incorrect or impossible move", HttpStatusCode.BadRequest),
@@ -33,7 +34,9 @@ enum class Status(val message: String, val statusCode: HttpStatusCode) {
         "Succeeded in getting game status - NOTE: this is not an official response",
         HttpStatusCode.OK
     ),
-    MOVE_REQUEST_WITHOUT_AUTHORIZATION("Authorization failed", HttpStatusCode.Forbidden),
+    MOVE_REQUEST_WITHOUT_AUTHORIZATION("Authorization failed", HttpStatusCode.Unauthorized),
+
+    //    MOVE_REQUEST_WITHOUT_AUTHORIZATION("Authorization failed", HttpStatusCode.Forbidden),
     MOVE_DONE("Move done", HttpStatusCode.OK),
 }
 
@@ -142,6 +145,14 @@ data class GameStatusResponsePayload(
         return result
     }
 }
+
+@Serializable
+data class GamesResponsePayload(
+    @SerialName("game_id") val gameId: Int,
+    @SerialName("player1") val playerXName: String? = null,
+    @SerialName("player2") val playerOName: String? = null,
+    @SerialName("size") val fieldDimensions: String? = null
+)
 
 @Serializable
 data class InfoPayload(
@@ -371,6 +382,25 @@ fun Application.configureRouting() {
                 }
             }
 
+            get("/games") {
+                val gamesResponses = mutableListOf<GamesResponsePayload>()
+                GameStore.mapIndexed { idx, game ->
+                    if (game is TicTacToeOnline) {
+                        gamesResponses.add(
+                            with(game) {
+                                GamesResponsePayload(
+                                    gameId = idx + 1,
+                                    playerXName = game.playerX.name,
+                                    playerOName = game.playerO.name,
+                                    fieldDimensions = game.fieldSize()
+                                )
+                            })
+                    } else {
+                        throw Exception("Unknown game type, only know about TicTacToeOnline")
+                    }
+                }
+                call.respond(gamesResponses.toList())
+            }
 
         }
 
@@ -383,7 +413,12 @@ fun Application.configureRouting() {
                 try {
                     ng = Json.decodeFromString<PlayerSignupRequestPayload>(json)
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.Forbidden, Status.REGISTRATION_FAILED.message)
+//                    call.respond(HttpStatusCode.Forbidden, Status.REGISTRATION_FAILED.message+"MONKEY")
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        Json.encodeToString(mapOf("status" to Status.REGISTRATION_FAILED.message))
+                    )
+
                     return@post
                 }
                 call.application.environment.log.info(ng.toString())
@@ -423,9 +458,14 @@ fun Application.configureRouting() {
                     call.respond(mapOf("status" to Status.SIGNED_IN.message, "token" to token))
                 } else {
                     call.respond(
-                        HttpStatusCode.Unauthorized,
-                        Json.encodeToString(mapOf("status" to Status.SIGNED_UP.message))
+                        Status.SIGNED_IN_FAILED.statusCode,
+//                        HttpStatusCode.Forbidden,
+                        Json.encodeToString(mapOf("status" to Status.SIGNED_IN_FAILED.message))
                     )
+//                    call.respond(
+//                        HttpStatusCode.Unauthorized,
+//                        Json.encodeToString(mapOf("status" to Status.SIGNED_UP.message))
+//                    )
                 }
 
             }

@@ -32,13 +32,13 @@ dependencies {
 
     // added based on https://hyperskill.org/projects/366/stages/2168/implement
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "io.ktor:ktor-auth:1.6.8"
+    implementation "io.ktor:ktor-auth-jwt:1.6.8"
     implementation "io.ktor:ktor-server-core:1.6.8"
     implementation "io.ktor:ktor-server-netty:1.6.8"
     implementation "ch.qos.logback:logback-classic:1.2.10"
     implementation "io.ktor:ktor-serialization:1.6.8"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0"
-    implementation "io.ktor:ktor-auth:1.6.8"
-    implementation "io.ktor:ktor-auth-jwt:1.6.8"
     testImplementation "io.ktor:ktor-server-test-host:1.6.8"
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.8")
 

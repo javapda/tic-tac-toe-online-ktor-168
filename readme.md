@@ -5,7 +5,15 @@
 * [dependencies](docs/project-dependencies.md)
 * [ktor experimentation](docs/ktor-experimentation.md)
 * [issues](docs/support/issues.md)
-* 
+
+## Tic-Tac-Toe Online URL's
+* [help](http://localhost:28852/help)
+* [info](http://localhost:28852/info)
+
+
+## additional resources
+* [forum entry slack-chats](https://slack-chats.kotlinlang.org/t/461392/hi-all-i-am-following-https-ktor-io-docs-testing-html-hocon-)
+
 ## Why?
 When working on the [Tic-Tac-Toe Online Project](https://hyperskill.org/projects/366)
 I found that while running `Solve in IDE` there were version issues. Namely, I was using
