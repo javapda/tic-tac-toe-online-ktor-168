@@ -1,4 +1,4 @@
-package tictactoeonline
+package tictactoeonline.hyperskill
 
 import com.auth0.jwt.JWT
 import io.ktor.application.*
@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tictactoeonline.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

@@ -1,10 +1,11 @@
-package tictactoeonline
+package tictactoeonline.hyperskill
 
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import tictactoeonline.*
 import tictactoeonline.util.MyJsonTools
 import kotlin.test.Test
 import kotlin.test.assertEquals

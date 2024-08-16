@@ -1,4 +1,4 @@
-package tictactoeonline
+package tictactoeonline.hyperskill
 
 class CheckResult(private val isCorrect: Boolean, private val feedback: String = "") {
 

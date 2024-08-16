@@ -1,4 +1,4 @@
-package tictactoeonline
+package tictactoeonline.hyperskill
 
 import com.auth0.jwt.JWT
 import io.ktor.application.*
@@ -10,6 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tictactoeonline.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.assertEquals
@@ -24,7 +25,7 @@ class HyperskillStage3Example1Test {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun `Example 1 signup and signin two people`() {
-        APPLICATION_TESTING=true
+        APPLICATION_TESTING =true
         withTestApplication(Application::module) {
             lateinit var user1: User
             lateinit var user2: User
