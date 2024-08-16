@@ -394,9 +394,6 @@ fun Application.configureRouting() {
                             fieldDimensions = ttt.fieldSize(),
                         )
                         call.respond(Status.GET_STATUS_SUCCEEDED.statusCode, gsrp)
-//                        games[game_id]?.let { user ->
-//                            call.respondText(user)
-//                        }
                     }
                 }
             }
