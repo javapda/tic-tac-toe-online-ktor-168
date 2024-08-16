@@ -5,11 +5,17 @@
 * [dependencies](docs/project-dependencies.md)
 * [ktor experimentation](docs/ktor-experimentation.md)
 * [issues](docs/support/issues.md)
+* [Stage 3 Tests](docs/support/stage_3_tests.md)
 
 ## Tic-Tac-Toe Online URL's
 * [help](http://localhost:28852/help)
 * [info](http://localhost:28852/info)
 
+## Solve in IDE Notes : TicTacToeOnlineTest
+* go to the `Tests` view in IntelliJ IDEA. (i.e. not the Course view) - it is selected from a dropdown list box at top
+left of the caption bar
+* look for `Tic-Tac-Toe_Online -> Tic-Tac-Toe_Online-task -> test -> Tic-Tac-Toe_Online/task/test -> TicTacToeOnlineTest`
+* TicTacToeOnlineTest : appears to be a `StageTest` for the project
 
 ## additional resources
 * [forum entry slack-chats](https://slack-chats.kotlinlang.org/t/461392/hi-all-i-am-following-https-ktor-io-docs-testing-html-hocon-)

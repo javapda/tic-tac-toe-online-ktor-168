@@ -23,10 +23,9 @@ class HyperskillStage3Example2Test {
 
     @Test
     fun `Example 2`() {
+
         withTestApplication(Application::module) {
             lateinit var user1: User
-//            lateinit var user2: User
-//            lateinit var response: HttpResponse
             val example2Size = "3x3"
 
             // 1. Request: POST /signup

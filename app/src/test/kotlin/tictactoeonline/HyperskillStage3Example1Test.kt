@@ -24,6 +24,7 @@ class HyperskillStage3Example1Test {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun `Example 1 signup and signin two people`() {
+        APPLICATION_TESTING=true
         withTestApplication(Application::module) {
             lateinit var user1: User
             lateinit var user2: User

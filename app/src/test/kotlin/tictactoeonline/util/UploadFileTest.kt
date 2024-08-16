@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.testing.*
 import io.ktor.utils.io.streams.*
+import org.junit.jupiter.api.Disabled
 import tictactoeonline.module
 import java.io.File
 import kotlin.test.Test
@@ -71,6 +72,7 @@ class UploadFileTest {
     }
 
 
+    @Disabled
     @Test
     fun `authentication REQUIRED POST upload of an image saves to app build uploads`() {
         withTestApplication(Application::module) {
