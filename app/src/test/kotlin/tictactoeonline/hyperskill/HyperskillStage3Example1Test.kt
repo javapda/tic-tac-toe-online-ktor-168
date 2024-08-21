@@ -9,8 +9,11 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIf
 import tictactoeonline.*
+import tictactoeonline.domain.TicTacToeOnlineStage
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.assertEquals
@@ -22,6 +25,9 @@ class HyperskillStage3Example1Test {
         clearAll()
     }
 
+    fun isNotStage3() = TicTacToeOnlineStage != 3
+
+    @DisabledIf("isNotStage3")
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun `Example 1 signup and signin two people`() {
@@ -112,6 +118,7 @@ class HyperskillStage3Example1Test {
 
             // 6. Request: POST /game
             // successfully /game first
+            // in Stage 4 we have to support private Games
             handleRequest(HttpMethod.Post, "/game") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 val payloadOfJwt: String = JWT().decodeJwt(user1.jwt).payload
@@ -125,7 +132,7 @@ class HyperskillStage3Example1Test {
                 addHeader("Authorization", "Bearer ${user1.jwt}")
 
                 val ngr: NewGameRequestPayload =
-                    NewGameRequestPayload(player1 = user1.email, player2 = "", size = example1Size)
+                    NewGameRequestPayload(player1 = user1.email, player2 = "", size = example1Size, privateRoom = false)
                 val json = Json.encodeToString(ngr)
                 setBody(json)
             }.apply {

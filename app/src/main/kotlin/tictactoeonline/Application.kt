@@ -27,6 +27,7 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
+    configureDatabase()
     configureContentNegotiationForJsonSerializationAndDeserialization()
     configureAuthenticationAndAuthorization()
     configureRouting()

@@ -70,7 +70,12 @@ data class PlayerSignupRequestPayload(val email: String, val password: String)
 data class PlayerSigninResponsePayload(val status: String, val token: String)
 
 @Serializable
-data class NewGameRequestPayload(val player1: String, val player2: String, val size: String) {
+data class NewGameRequestPayload(
+    val player1: String,
+    val player2: String,
+    val size: String,
+    @SerialName("private") val privateRoom: Boolean = false
+) {
     enum class NewGameRequestPayloadError(description: String) {
         BOTH_PLAYER_MISSING_EMAIL_ADDRESS("both player missing email address"),
         BOTH_PLAYER_EMAIL_ADDRESSES_PRESENT("both player email address present, should only have one"),
@@ -103,7 +108,9 @@ data class NewGameResponsePayload(
     val player1: String,
     val player2: String,
     val size: String,
-    @SerialName("game_id") val gameId: Int
+    @SerialName("game_id") val gameId: Int,
+    // https://hyperskill.org/projects/366/stages/2169/implement#comment
+    @SerialName("token") val privateRoomToken: String,
 )
 
 
@@ -299,7 +306,8 @@ fun Application.configureRouting() {
                     player1 = player1,
                     player2 = player2,
                     gameId = game_id,
-                    size = newGameRequestPayload.size
+                    size = newGameRequestPayload.size,
+                    privateRoomToken = if (newGameRequestPayload.privateRoom) Game.privateRoomToken() else ""
                 )
                 call.respond(respPayload)
             }

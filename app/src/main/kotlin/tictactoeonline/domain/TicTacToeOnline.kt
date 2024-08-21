@@ -3,22 +3,11 @@ package tictactoeonline.domain
 const val DEFAULT_PLAYER_X_NAME = "Player1"
 const val DEFAULT_PLAYER_O_NAME = "Player2"
 const val DEFAULT_FIELD_DIMENSIONS = "3x3"
-
-enum class GameState(val description: String) {
-    NOT_STARTED("game not started"),
-    PLAYER_MOVE_1("1st player's move"),
-    PLAYER_MOVE_2("2nd player's move"),
-    GAME_OVER_WINNER_1("1st player won"),
-    GAME_OVER_WINNER_2("2nd player won"),
-    GAME_OVER_DRAW("draw"),
-}
-
-interface Game {
-    fun initializeField(size: String)
-}
+const val TicTacToeOnlineStage = 3
+fun isNotStage3() = TicTacToeOnlineStage != 3
 
 
-class TicTacToeOnline(val verbose: Boolean = false) : Game {
+class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = false) : Game {
     lateinit var field: PlayingGrid
     lateinit var playerX: Player
     lateinit var playerO: Player
@@ -247,6 +236,7 @@ class TicTacToeOnline(val verbose: Boolean = false) : Game {
     fun playerXName(): String {
         return if (this::playerX.isInitialized) playerX.name else ""
     }
+
     fun playerOName(): String {
         return if (this::playerO.isInitialized) playerO.name else ""
     }

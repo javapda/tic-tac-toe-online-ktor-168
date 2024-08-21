@@ -9,19 +9,23 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIf
 import tictactoeonline.*
+import tictactoeonline.domain.TicTacToeOnlineStage
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class HyperskillStage3Example2Test {
-    fun emailFromJwt(jwt: String) =
-        JWT.require(algorithm).build().verify(jwt).getClaim("email").asString()
+    fun emailFromJwt(jwt: String) = JWT.require(algorithm).build().verify(jwt).getClaim("email").asString()
 
     @BeforeEach
     fun setup() {
         clearAll()
     }
 
+    fun isNotStage3() = TicTacToeOnlineStage != 3
+
+    @DisabledIf("isNotStage3")
     @Test
     fun `Example 2`() {
 
@@ -98,7 +102,7 @@ class HyperskillStage3Example2Test {
 
                 val email = emailFromJwt(user1.jwt!!)
                 val ngr: NewGameRequestPayload =
-                    NewGameRequestPayload(player1 = "", player2 = user1.email, size = example2Size)
+                    NewGameRequestPayload(player1 = "", player2 = user1.email, size = example2Size, privateRoom = false)
                 val json = Json.encodeToString(ngr)
                 setBody(json)
             }.apply {

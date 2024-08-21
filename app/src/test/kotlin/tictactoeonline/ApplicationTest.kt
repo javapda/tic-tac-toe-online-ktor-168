@@ -105,7 +105,8 @@ class ApplicationTest {
                     NewGameRequestPayload(
                         player1 = "Jed@Clampett.com",
                         player2 = "Wilma@Flintstone.com",
-                        size = "4x3"
+                        size = "4x3",
+                        privateRoom = false,
                     )
                 )
                 println(

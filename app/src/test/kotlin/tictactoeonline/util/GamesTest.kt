@@ -24,7 +24,7 @@ class GamesTest {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun `test games need at least 2 games`() {
-        APPLICATION_TESTING=true
+        APPLICATION_TESTING = true
         // start a game
         fun doGame(emailUser1: String, emailUser2: String, fieldSize: String = "3x3", gameId: Int) {
             withTestApplication(Application::module) {
@@ -87,7 +87,12 @@ class GamesTest {
                     addHeader("Authorization", "Bearer ${user1.jwt}")
 
                     val ngr: NewGameRequestPayload =
-                        NewGameRequestPayload(player1 = user1.email, player2 = "", size = example1Size)
+                        NewGameRequestPayload(
+                            player1 = user1.email,
+                            player2 = "",
+                            size = example1Size,
+                            privateRoom = false
+                        )
                     val json = Json.encodeToString(ngr)
                     setBody(json)
 

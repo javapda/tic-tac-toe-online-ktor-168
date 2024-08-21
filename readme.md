@@ -6,10 +6,23 @@
 * [ktor experimentation](docs/ktor-experimentation.md)
 * [issues](docs/support/issues.md)
 * [Stage 3 Tests](docs/support/stage_3_tests.md)
+* [Exposed learning](docs/exposed-learning.md)
+* [Microservices](docs/ktor-microservices.md)
+* [Cucumber](docs/cucumber.md)
 
 ## Tic-Tac-Toe Online URL's
 * [help](http://localhost:28852/help)
 * [info](http://localhost:28852/info)
+
+# Stages
+
+## Stage 5/5 :
+## [Stage 4/5 : Adding private rooms](docs/stage_4_of_5_adding_private_rooms.md)
+## [Stage 3/5 : Adding authorization and room mechanism](docs/stage_3_of_5_adding_authorization_mechanism.md)
+## [Stage 2/5 : Moving to the server](docs/stage_2_of_5_moving_to_the_server.md)
+## [Stage 1/5 : Console game](docs/stage_1_of_5_console_game.md)
+
+
 
 ## Solve in IDE Notes : TicTacToeOnlineTest
 * go to the `Tests` view in IntelliJ IDEA. (i.e. not the Course view) - it is selected from a dropdown list box at top

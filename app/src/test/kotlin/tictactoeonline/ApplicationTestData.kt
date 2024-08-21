@@ -2,6 +2,19 @@ package tictactoeonline
 
 import com.auth0.jwt.algorithms.Algorithm
 import kotlinx.serialization.Serializable
+const val MAX_VARCHAR_LENGTH: Int = 128
+class H2DatabaseTestMetaData {
+    companion object {
+        val h2FileForTesting = "./build/johnsH2Test"
+        val h2FileForTestingUsersAndGames = "./build/usersAndGamesH2Test"
+        val h2FileForTestingBaeldungStarWars = "./build/h2FileForTestingBaeldungStarWars"
+        val h2FileForTestingBaeldungDAOStarWars = "./build/h2FileForTestingBaeldungDAOStarWars"
+        val h2InMemoryJdbcUrl = "jdbc:h2:mem:test"
+        val h2FileBasedJdbcUrl = "jdbc:h2:$h2FileForTesting"
+        val h2JdbcDriverClassName = "org.h2.Driver"
+
+    }
+}
 
 /**
  * place to declare various data items used during application testing
