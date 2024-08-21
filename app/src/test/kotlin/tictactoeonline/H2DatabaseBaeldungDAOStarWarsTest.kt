@@ -5,6 +5,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
@@ -37,6 +39,34 @@ class H2DatabaseBaeldungDAOStarWarsTest {
         var sequelId by StarWarsFilms.sequelId
         var name by StarWarsFilms.name
         var director by StarWarsFilms.director
+
+        // one-to-many : one StarWarsFilm may have zero-or-many UserRating
+        // NOTE: this must be immutable (val) - can only be read
+        val ratings by UserRating referrersOn UserRatings.film
+
+        var actors by Actor via StarWarsFilmActors
+    }
+
+    object Actors : IntIdTable() {
+        val firstName = varchar("firstname", 50)
+        val lastname = varchar("lastname", 50)
+    }
+
+    class Actor(id: EntityID<Int>) : IntEntity(id) {
+        companion object : IntEntityClass<Actor>(Actors)
+
+        var firstname by Actors.firstName
+        var lastname by Actors.lastname
+    }
+
+    object StarWarsFilmActors : Table() {
+        // table (link-table) to tie StarWarsFilm to Actors
+        // table has 2 columns, both are foreign keys making up a composite primary key
+        val starWarsFilm = reference("starWarsFilm", StarWarsFilms)
+        val actor = reference("actor", Actors)
+        override val primaryKey = PrimaryKey(
+            starWarsFilm, actor, name = "PK_StarWarsFilmActors_swf_act"
+        )
     }
 
     @Test
@@ -103,12 +133,141 @@ class H2DatabaseBaeldungDAOStarWarsTest {
         }
     }
 
+    object Users : IntIdTable() {
+        val name = varchar("name", 50)
+    }
+
+    class User(id: EntityID<Int>) : IntEntity(id) {
+        // tie this DAO to the underlying table
+        companion object : IntEntityClass<User>(Users)
+
+        var name by Users.name
+    }
+
+    object UserRatings : IntIdTable() {
+        val value = long("value")
+        val film = reference("film", StarWarsFilms)
+        val user = reference("user", Users).nullable()
+    }
+
+    class UserRating(id: EntityID<Int>) : IntEntity(id) {
+        // tie this DAO to the underlying table
+        companion object : IntEntityClass<UserRating>(UserRatings)
+
+        // link/tie local properties to their table equivalents
+        var value by UserRatings.value
+        var film by StarWarsFilm referencedOn UserRatings.film
+
+        // using optionalReferencedOn allows us to put a null in the field (but the field must first be .nullable())
+        // this is SO COOL, since you are prevented from inadvertently making something null that is not supposed to be
+        var user by User optionalReferencedOn UserRatings.user
+//        var user by User referencedOn UserRatings.user
+    }
+
     @Test
     fun `Many-to-One Associations 8_5`() {
         // https://www.baeldung.com/kotlin/exposed-persistence#5-many-to-one-associations
-//        TODO("8.5 Many-to-One Associations")
-        val names = listOf("Denise","Walker","Griffin")
-        println(names.sorted())
+        // 2-step proces
+        // step 1: create the Table objects (Users,UserRatings,etc.)
+        // step 2: create the DAO classes (UserRating)
+        transaction {
+            val theLastJedi = StarWarsFilm.new {
+                name = "The Last Jedi"
+                director = "Rian Johnson"
+                sequelId = 8
+            }
+            val someUser = User.new {
+                name = "Some User"
+            }
+            val rating = UserRating.new {
+                value = 9
+                user = someUser
+                film = theLastJedi
+            }
+            assertEquals(theLastJedi, rating.film)
+        }
+    }
+
+    @Test
+    fun `Optional Associations 8_6`() {
+        transaction {
+            val theLastJedi = StarWarsFilm.new {
+                name = "The Last Jedi"
+                director = "Rian Johnson"
+                sequelId = 8
+            }
+            val someUser = User.new {
+                name = "Some User"
+            }
+            val rating = UserRating.new {
+                value = 9
+//                user = someUser
+                film = theLastJedi
+            }
+            assertEquals(theLastJedi, rating.film)
+            assertNull(rating.user)
+        }
+
+    }
+
+    @Test
+    fun `One-to-Many Associations 8_7`() {
+        // https://www.baeldung.com/kotlin/exposed-persistence#7-one-to-many-associations
+        transaction {
+            val theLastJedi = StarWarsFilm.new {
+                name = "The Last Jedi"
+                director = "Rian Johnson"
+                sequelId = 8
+            }
+            val someUser1 = User.new {
+                name = "Some User : 1"
+            }
+            val someUser2 = User.new {
+                name = "Some User : 2"
+            }
+            val rating1 = UserRating.new {
+                value = 9
+//                user = someUser1
+                film = theLastJedi
+            }
+            val rating2 = UserRating.new {
+                value = 3
+                user = someUser2
+                film = theLastJedi
+            }
+            assertEquals(theLastJedi, rating1.film)
+            assertNull(rating1.user)
+            assertEquals(2, theLastJedi.ratings.count())
+
+        }
+    }
+
+    @Test
+    fun `Many-to-Many Associations 8_8`() {
+        // https://www.baeldung.com/kotlin/exposed-persistence#8-many-to-many-associations
+        var film: StarWarsFilm? = null
+        var actor: Actor? = null
+        film = transaction {
+            StarWarsFilm.new {
+                name = "The Last Jedi"
+                sequelId = 8
+                director = "Rian Johnson"
+            }
+        }
+
+        actor = transaction {
+            Actor.new {
+                firstname = "Daisy"
+                lastname = "Ridley"
+            }
+//            assertEquals(1, Actors.selectAll().count())
+//            exposedLogger.info("That is many-to-many associations")
+        }
+        transaction {
+            // link the actors to the container
+            film.actors = SizedCollection(listOf(actor))
+
+        }
     }
 
     @Test
@@ -127,7 +286,7 @@ class H2DatabaseBaeldungDAOStarWarsTest {
     private suspend fun doWorld() {
         val delaySeconds = 5L
         println("Start doWorld, delay $delaySeconds seconds")
-        delay(delaySeconds*1000)
+        delay(delaySeconds * 1000)
         println("do world time")
     }
 
@@ -145,7 +304,11 @@ class H2DatabaseBaeldungDAOStarWarsTest {
 
             // https://www.baeldung.com/kotlin/exposed-persistence#4-creating-tables
             SchemaUtils.create(
-                StarWarsFilms
+                Actors,
+                StarWarsFilms,
+                StarWarsFilmActors,
+                Users,
+                UserRatings
             )
             exposedLogger.info(
                 """
