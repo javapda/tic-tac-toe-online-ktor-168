@@ -1,5 +1,7 @@
 package tictactoeonline.domain
 
+import tictactoeonline.util.MyStringTools
+
 const val DEFAULT_PLAYER_X_NAME = "Player1"
 const val DEFAULT_PLAYER_O_NAME = "Player2"
 const val DEFAULT_FIELD_DIMENSIONS = "3x3"
@@ -7,7 +9,11 @@ const val TicTacToeOnlineStage = 3
 fun isNotStage3() = TicTacToeOnlineStage != 3
 
 
-class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = false) : Game {
+class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = false) {
+    companion object {
+        fun privateRoomToken(): String = MyStringTools.randomStringByKotlinRandom(32)
+    }
+
     lateinit var field: PlayingGrid
     lateinit var playerX: Player
     lateinit var playerO: Player
@@ -16,9 +22,9 @@ class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = f
     var state: GameState = GameState.NOT_STARTED
     fun addPlayer(player: Player) {
         if (this::playerX.isInitialized && playerX.name.isNotEmpty()) {
-            playerO = Player(player.name, 'O')
+            playerO = Player(player.user, 'O')
         } else {
-            playerX = Player(player.name, 'X')
+            playerX = Player(player.user, 'X')
 
         }
         if (this::playerX.isInitialized && this::playerO.isInitialized
@@ -45,6 +51,7 @@ class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = f
         )
     }
 
+    @Deprecated(level = DeprecationLevel.ERROR, message = "no longer used")
     fun startGame() {
         print("Enter the first player's name ($DEFAULT_PLAYER_X_NAME by default)\n> ")
         val player1 = readln().trim().let { if (it.trim().isEmpty()) DEFAULT_PLAYER_X_NAME else it }
@@ -66,13 +73,13 @@ class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = f
         """.trimIndent()
             )
         }
-        playerX = Player(player1)
-        playerO = Player(player2)
-        field = PlayingGrid(fieldDimensions)
-        currentPlayer = playerX
-        println("Field size: ${field.height}x${field.width}")
-        println(field.render(playerXLocations = playerX.locations, playerOLocations = playerO.locations))
-        gameLoop()
+//        playerX = Player(player1)
+//        playerO = Player(player2)
+//        field = PlayingGrid(fieldDimensions)
+//        currentPlayer = playerX
+//        println("Field size: ${field.height}x${field.width}")
+//        println(field.render(playerXLocations = playerX.locations, playerOLocations = playerO.locations))
+//        gameLoop()
     }
 
 
@@ -177,19 +184,20 @@ class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = f
         return !field.isWinner() && !field.isDraw()
     }
 
+    @Deprecated(level = DeprecationLevel.ERROR, message = "no longer needed, once online")
     fun newGame(player1: String, player2: String, size: String): Boolean {
-
-        if (PlayingGrid.isValidFieldDimensionString(size)) {
-            field = PlayingGrid(size)
-            playerX = Player(player1)
-            playerO = Player(player2)
-            state = GameState.PLAYER_MOVE_1
-            moveCount = 0
-            currentPlayer = playerX
-            return true
-        } else {
-            throw IllegalArgumentException("Invalid field Dimensions '$size'")
-        }
+        return false
+//        if (PlayingGrid.isValidFieldDimensionString(size)) {
+//            field = PlayingGrid(size)
+//            playerX = Player(player1)
+//            playerO = Player(player2)
+//            state = GameState.PLAYER_MOVE_1
+//            moveCount = 0
+//            currentPlayer = playerX
+//            return true
+//        } else {
+//            throw IllegalArgumentException("Invalid field Dimensions '$size'")
+//        }
 
     }
 
@@ -227,7 +235,7 @@ class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = f
     private fun currentPlayerNumber(): Int =
         if (currentPlayer == playerX) 1 else 2
 
-    override fun initializeField(size: String) {
+    fun initializeField(size: String) {
         field = PlayingGrid(
             if (PlayingGrid.isValidFieldDimensionString(size)) size else DEFAULT_FIELD_DIMENSIONS
         )
@@ -245,5 +253,5 @@ class TicTacToeOnline(val verbose: Boolean = false, var privateRoom: Boolean = f
 }
 
 fun main() {
-    TicTacToeOnline().startGame()
+//    TicTacToeOnline().startGame()
 }

@@ -1,16 +1,13 @@
 package tictactoeonline.domain
 
-class Player(val name: String, val marker: Char = '?') {
+import tictactoeonline.User
+
+class Player(val user: User, val marker: Char = '?') {
+    val name: String = user.email
     val locations = mutableSetOf<CellLocation>()
 
     override fun toString(): String {
-        return "Player: name=$name, marker=$marker, no. locations: ${locations.size}"
-//        return """
-//            Player  - HERE
-//            name:       $name
-//            marker:    $marker
-//            locations:  $locations
-//        """.trimIndent()
+        return "Player: user=$user, name=$name, marker=$marker, no. locations: ${locations.size}"
     }
 
 }

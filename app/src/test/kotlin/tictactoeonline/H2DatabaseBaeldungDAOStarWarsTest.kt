@@ -59,6 +59,7 @@ class H2DatabaseBaeldungDAOStarWarsTest {
         var lastname by Actors.lastname
     }
 
+    // this is the link table between StarWarsFilm and Actors
     object StarWarsFilmActors : Table() {
         // table (link-table) to tie StarWarsFilm to Actors
         // table has 2 columns, both are foreign keys making up a composite primary key

@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import tictactoeonline.domain.Game
+//import tictactoeonline.domain.Game
 import tictactoeonline.domain.Player
 import tictactoeonline.domain.PlayingGrid
 import tictactoeonline.domain.TicTacToeOnline
@@ -76,7 +76,7 @@ data class NewGameRequestPayload(
     val size: String,
     @SerialName("private") val privateRoom: Boolean = false
 ) {
-    enum class NewGameRequestPayloadError(description: String) {
+    enum class NewGameRequestPayloadError(val description: String) {
         BOTH_PLAYER_MISSING_EMAIL_ADDRESS("both player missing email address"),
         BOTH_PLAYER_EMAIL_ADDRESSES_PRESENT("both player email address present, should only have one"),
         INVALID_FIELD_DIMENSIONS_PROVIDED("invalid field dimensions provided")
@@ -191,7 +191,7 @@ data class HelpPayload(val endpoints: List<Endpoint>)
 
 val UserStore: MutableList<User> = mutableListOf()
 val UserSignedInStore: MutableList<User> = mutableListOf()
-val GameStore: MutableList<Game> = mutableListOf()
+val GameStore: MutableList<TicTacToeOnline> = mutableListOf()
 
 fun clearAll() {
     GameStore.clear()
@@ -224,7 +224,7 @@ fun Application.configureRouting() {
             post("/uploadSecure") {
                 var fileDescription: String
                 var fileName: String
-                var fileUploadDestination: File = File(".")
+                var fileUploadDestination = File(".")
                 // https://ktor.io/docs/old/requests.html#form_data
                 val multipartData = call.receiveMultipart()
                 multipartData.forEachPart { part ->
@@ -235,7 +235,7 @@ fun Application.configureRouting() {
 
                         is PartData.FileItem -> {
                             fileName = part.originalFileName as String
-                            var fileBytes = part.streamProvider().readBytes()
+                            val fileBytes = part.streamProvider().readBytes()
                             val destinationDirectory = File("build/uploads")
                             if (!destinationDirectory.exists()) {
                                 destinationDirectory.mkdirs()
@@ -269,8 +269,9 @@ fun Application.configureRouting() {
                 return this.principal<JWTPrincipal>()!!.payload.getClaim("email").asString()
             }
             post("/game") {
-                val authHeader = call.request.headers[HttpHeaders.Authorization]
-                val principal = call.principal<JWTPrincipal>()
+                // We want to start a new game here
+                //val authHeader = call.request.headers[HttpHeaders.Authorization]
+                //val principal = call.principal<JWTPrincipal>()
                 val playerEmailAddress = call.playerEmail()
                 val newGameRequestPayload = call.receive<NewGameRequestPayload>()
                 if (newGameRequestPayload.player1 != playerEmailAddress && newGameRequestPayload.player2 != playerEmailAddress) {
@@ -281,7 +282,8 @@ fun Application.configureRouting() {
                     return@post
                 }
                 require(UserStore.any { user -> user.email == playerEmailAddress })
-                val user = UserStore.find { user -> user.email == playerEmailAddress }
+                val user = UserStore.find { user -> user.email == playerEmailAddress }!!
+
                 val newGame = TicTacToeOnline()
                 newGame.initializeField(newGameRequestPayload.size)
                 GameStore.add(newGame)
@@ -292,11 +294,11 @@ fun Application.configureRouting() {
                 var player1 = ""
                 var player2 = ""
                 if (newGameRequestPayload.player1.isNotEmpty()) {
-                    newGame.playerX = Player(name = newGameRequestPayload.player1, marker = 'X')
+                    newGame.playerX = Player(user = user, marker = 'X')
                     player1 = newGameRequestPayload.player1
                     newGameRequestPayload.player1
                 } else {
-                    newGame.playerO = Player(name = newGameRequestPayload.player2, marker = 'O')
+                    newGame.playerO = Player(user = user, marker = 'O')
                     player2 = newGameRequestPayload.player2
                     newGameRequestPayload.player2
                 }
@@ -307,7 +309,7 @@ fun Application.configureRouting() {
                     player2 = player2,
                     gameId = game_id,
                     size = newGameRequestPayload.size,
-                    privateRoomToken = if (newGameRequestPayload.privateRoom) Game.privateRoomToken() else ""
+                    privateRoomToken = if (newGameRequestPayload.privateRoom) TicTacToeOnline.privateRoomToken() else ""
                 )
                 call.respond(respPayload)
             }
@@ -326,12 +328,9 @@ fun Application.configureRouting() {
                             )
                         } else {
                             val game = GameStore[game_id - 1]
-                            val ttt = game as TicTacToeOnline
                             // need utility to get player from JWT
-                            val user = UserStore.find { user -> user.email == playerEmail }
-
-                            ttt.addPlayer(Player(name = user?.email ?: "BOGUS-EMAIL", marker = 'X'))
-
+                            val user = UserStore.find { user -> user.email == playerEmail }!!
+                            game.addPlayer(Player(user = user, marker = 'X'))
                             @Serializable
                             data class StatusPayload(val status: String = Status.JOINING_GAME_SUCCEEDED.message)
                             call.respond(Status.JOINING_GAME_SUCCEEDED.statusCode, StatusPayload())
@@ -348,23 +347,22 @@ fun Application.configureRouting() {
                     stringId.toIntOrNull()?.let { game_id ->
                         val playerEmail = call.playerEmail()
                         val game = GameStore[game_id - 1]
-                        val ttt = game as TicTacToeOnline
                         val playerMoveRequestPayload = call.receive<PlayerMoveRequestPayload>()
                         val move = playerMoveRequestPayload.move
 
-                        if (ttt.currentPlayer.name != playerEmail) {
+                        if (game.currentPlayer.name != playerEmail) {
                             // if it's not your turn, then you have no right
                             call.respond(
                                 Status.NO_RIGHTS_TO_MOVE.statusCode,
                                 PlayerMoveResponsePayload(Status.NO_RIGHTS_TO_MOVE.message)
                             )
-                        } else if (ttt.isValidMove(move) && ttt.isOccupied(move)) {
+                        } else if (game.isValidMove(move) && game.isOccupied(move)) {
                             // fail, move
                             call.respond(
                                 Status.INCORRECT_OR_IMPOSSIBLE_MOVE.statusCode,
                                 PlayerMoveResponsePayload(Status.INCORRECT_OR_IMPOSSIBLE_MOVE.message)
                             )
-                        } else if (ttt.isValidMove(move) && ttt.move(move)) {
+                        } else if (game.isValidMove(move) && game.move(move)) {
                             // success
                             call.respond(
                                 Status.MOVE_DONE.statusCode,
@@ -388,9 +386,8 @@ fun Application.configureRouting() {
                 call.parameters["game_id"]?.let { stringId ->
                     stringId.toIntOrNull()?.let { game_id ->
                         val game = GameStore[game_id - 1]
-                        val ttt = game as TicTacToeOnline
                         val playerEmail = call.playerEmail()
-                        if (ttt.playerXName() != playerEmail && ttt.playerOName() != playerEmail) {
+                        if (game.playerXName() != playerEmail && game.playerOName() != playerEmail) {
                             call.respond(
                                 Status.GET_STATUS_FAILED.statusCode,
                                 mapOf("status" to Status.GET_STATUS_FAILED.message)
@@ -399,11 +396,11 @@ fun Application.configureRouting() {
                         }
                         val gsrp = GameStatusResponsePayload(
                             gameId = (GameStore.indexOf(game) + 1),
-                            status = ttt.state.description,
-                            field2DArray = ttt.renderFieldTo2DArray(),
-                            playerXName = ttt.playerXName(),
-                            playerOName = ttt.playerOName(),
-                            fieldDimensions = ttt.fieldSize(),
+                            status = game.state.description,
+                            field2DArray = game.renderFieldTo2DArray(),
+                            playerXName = game.playerXName(),
+                            playerOName = game.playerOName(),
+                            fieldDimensions = game.fieldSize(),
                         )
                         call.respond(Status.GET_STATUS_SUCCEEDED.statusCode, gsrp)
                     }
@@ -413,19 +410,15 @@ fun Application.configureRouting() {
             get("/games") {
                 val gamesResponses = mutableListOf<GamesResponsePayload>()
                 GameStore.mapIndexed { idx, game ->
-                    if (game is TicTacToeOnline) {
-                        gamesResponses.add(
-                            with(game) {
-                                GamesResponsePayload(
-                                    gameId = idx + 1,
-                                    playerXName = game.playerXName(),
-                                    playerOName = game.playerOName(),
-                                    fieldDimensions = game.fieldSize()
-                                )
-                            })
-                    } else {
-                        throw Exception("Unknown game type, only know about TicTacToeOnline")
-                    }
+                    gamesResponses.add(
+                        with(game) {
+                            GamesResponsePayload(
+                                gameId = idx + 1,
+                                playerXName = game.playerXName(),
+                                playerOName = game.playerOName(),
+                                fieldDimensions = game.fieldSize()
+                            )
+                        })
                 }
                 call.respond(gamesResponses.toList())
             }
@@ -437,7 +430,7 @@ fun Application.configureRouting() {
 
             post("/signup") {
                 val json = call.receiveText()
-                var ng: PlayerSignupRequestPayload? = null
+                val ng: PlayerSignupRequestPayload?
                 try {
                     ng = Json.decodeFromString<PlayerSignupRequestPayload>(json)
                 } catch (e: Exception) {
@@ -506,13 +499,14 @@ fun Application.configureRouting() {
             post("/upload") {
                 var fileDescription: String
                 var fileName: String
-                var fileUploadDestination: File = File(".")
+                var fileUploadDestination = File(".")
                 // https://ktor.io/docs/old/requests.html#form_data
                 val multipartData = call.receiveMultipart()
                 multipartData.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
                             fileDescription = part.value
+                            log.debug("fileDescription: $fileDescription")
                         }
 
                         is PartData.FileItem -> {

@@ -7,6 +7,7 @@
 * [issues](docs/support/issues.md)
 * [Stage 3 Tests](docs/support/stage_3_tests.md)
 * [Exposed learning](docs/exposed-learning.md)
+* [postgres](docs/postgres.md)
 * [Microservices](docs/ktor-microservices.md)
 * [Cucumber](docs/cucumber.md)
 

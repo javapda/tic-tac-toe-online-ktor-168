@@ -15,7 +15,7 @@ object MyUser : IntIdTable() {
 
 fun Application.configureDatabase(clearDatabase: Boolean = false) {
 //    val databaseFile = File("./build/db.mv.db")
-    val databaseFile = File("./build/db")
+    val databaseFile = File("./build/db") // results in PROJECT/app/build/db.mv.db
     val databaseFileOnFileSystem = File("${databaseFile.absoluteFile}.mv.db")
     if (clearDatabase) {
         if (databaseFileOnFileSystem.exists()) {

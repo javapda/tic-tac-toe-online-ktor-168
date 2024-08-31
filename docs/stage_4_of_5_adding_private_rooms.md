@@ -1,9 +1,11 @@
 # [Stage 4/5:Adding private rooms](https://hyperskill.org/projects/366/stages/2169/implement) | [main README.md](../readme.md)
 
 ### John's Notes
-
+#### resources
+* [medium article on Exposed](https://medium.com/@patricktaddei/ktor-and-exposed-the-new-golden-stack-in-the-kotlin-world-b2752e5374fb)
+* [medium article's github](https://github.com/pattad/ktor-exposed)
 #### steps
-* add dependencies for persistence (exposed, h2, etc.)
+* DONE add dependencies for persistence (exposed, h2, etc.)
 * add some DB setup and write to file ./build/db.mv.db
 * create some basic tests for persistence
 ---

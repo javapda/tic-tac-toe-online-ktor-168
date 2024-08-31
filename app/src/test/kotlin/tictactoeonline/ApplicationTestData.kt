@@ -9,9 +9,11 @@ class H2DatabaseTestMetaData {
         val h2FileForTestingUsersAndGames = "./build/usersAndGamesH2Test"
         val h2FileForTestingBaeldungStarWars = "./build/h2FileForTestingBaeldungStarWars"
         val h2FileForTestingBaeldungDAOStarWars = "./build/h2FileForTestingBaeldungDAOStarWars"
+        val h2FileForApplicationTestWithApplicationTest = "./build/applicationTestWithApplicationTest"
         val h2InMemoryJdbcUrl = "jdbc:h2:mem:test"
         val h2FileBasedJdbcUrl = "jdbc:h2:$h2FileForTesting"
         val h2JdbcDriverClassName = "org.h2.Driver"
+
 
     }
 }
