@@ -3,7 +3,6 @@
 ## resource
 * [Exposed docs](https://jetbrains.github.io/Exposed)
 * [Baeldung article on Exposed](https://www.baeldung.com/kotlin/exposed-persistence#3-foreign-keys) | [tests DAO](../app/src/test/kotlin/tictactoeonline/H2DatabaseBaeldungDAOStarWarsTest.kt) | [tests JDBC (no DAO)](../app/src/test/kotlin/tictactoeonline/H2DatabaseBaeldungStarWarsTest.kt)
-* [problem with H2 version](https://stackoverflow.com/questions/40729216/h2-database-unsupported-database-file-version-or-invalid-file-header-in-file) 
 * [problem with H2 version](https://stackoverflow.com/questions/40729216/h2-database-unsupported-database-file-version-or-invalid-file-header-in-file)
   * when going to a different version of H2 (to 2.2.224 from 2.1.214) I ran into a version conflict with a H2 database file
 that was created with the earlier version. To remedy, delete and recreate the file. 
