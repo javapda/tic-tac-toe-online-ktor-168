@@ -6,8 +6,8 @@
 * [medium article's github](https://github.com/pattad/ktor-exposed)
 #### steps
 * DONE add dependencies for persistence (exposed, h2, etc.)
-* add some DB setup and write to file ./build/db.mv.db
-* create some basic tests for persistence
+* DONE add some DB setup and write to file ./build/db.mv.db
+* DONE create some basic tests for persistence
 ---
 
 ### Description
