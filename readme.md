@@ -10,6 +10,7 @@
 * [postgres](docs/postgres.md)
 * [Microservices](docs/ktor-microservices.md)
 * [Cucumber](docs/cucumber.md)
+* [gradle notes](docs/gradle-notes.md)
 
 ## Tic-Tac-Toe Online URL's
 * [help](http://localhost:28852/help)
