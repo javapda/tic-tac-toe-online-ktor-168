@@ -15,6 +15,7 @@
 ## Tic-Tac-Toe Online URL's
 * [help](http://localhost:28852/help)
 * [info](http://localhost:28852/info)
+* [Tic-Tac-Toe Online Project](https://hyperskill.org/projects/366)
 
 # Stages
 

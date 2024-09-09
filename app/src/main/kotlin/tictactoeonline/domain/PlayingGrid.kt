@@ -26,6 +26,10 @@ class PlayingGrid(
         initVirtualPlayingGrids()
     }
 
+    val virtualPlayingGrids: MutableList<VirtualPlayingGrid> = mutableListOf()
+    private val playerXLocations: MutableSet<CellLocation> = mutableSetOf()
+    private val playerOLocations: MutableSet<CellLocation> = mutableSetOf()
+
     private fun initVirtualPlayingGrids() {
         virtualPlayingGrids.clear()
         (0 until max(height - 2, 1)).forEach { x ->
@@ -35,9 +39,6 @@ class PlayingGrid(
         }
     }
 
-    val virtualPlayingGrids: MutableList<VirtualPlayingGrid> = mutableListOf()
-    private val playerXLocations: MutableSet<CellLocation> = mutableSetOf()
-    private val playerOLocations: MutableSet<CellLocation> = mutableSetOf()
 
     /**
      * Grid separator line

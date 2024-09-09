@@ -6,7 +6,26 @@
 * [kotlin-exposed on stackoverflow](https://stackoverflow.com/questions/tagged/kotlin-exposed)
 * SQLDeveloper : [download](https://www.oracle.com/database/sqldeveloper/technologies/download/)|[article](https://www.enterprisedb.com/postgres-tutorials/how-connect-postgresql-using-sql-developer-visual-studio-and-dbeaver)
 * [postgres jdbc driver download](https://jdbc.postgresql.org/download/)
+* [postgres keywords (including USER)](https://www.postgresql.org/docs/current/sql-keywords-appendix.html)
 
+## issues
+### unable to drop table `user`
+* created a table called 'user' in postgres, but when went to drop it with `drop table user;` was getting the following
+error:
+```
+ERROR:  syntax error at or near "user"
+LINE 1: drop table user;
+                   ^ 
+
+SQL state: 42601
+Character: 12 
+```
+* The issue I was encountering happens because `user` is a reserved keyword in PostgreSQL. To avoid this 
+syntax error, you need to tell PostgreSQL that you are referring to the table and not the keyword by 
+quoting the table name. You can drop the table by using double quotes around user, like this:
+```
+drop table "user";
+```
 
 ## log into postgres using psql
 ```
